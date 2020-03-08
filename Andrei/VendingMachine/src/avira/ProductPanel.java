@@ -8,21 +8,60 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ProductPanel {
     static ProductPanel instance = null;
-    JFrame productFrame = new JFrame();
-    int nrprime = 0;
-    int nrpro = 0;
-    int nrvpn = 0;
-    int nrpass = 0;
-    int nroptim = 0;
-    int nrspeed = 0;
+    JFrame oldFrame, newFrame;
+    ArrayList<Product> products;
+    ArrayList<BufferedImage> productImages;
+    ArrayList<JLabel> productTexts;
+    ArrayList<Box> boxes;
+    ArrayList<JButton> productButtons;
+    int[] nr = {0, 0, 0, 0, 0, 0};
     Limits limits = new Limits();
 
-    private ProductPanel(JFrame frame, JFrame newFrame, Limits limits) throws IOException {
+    private ProductPanel(JFrame frame, JFrame newFrame, Limits limits, ArrayList<Product> products) throws IOException {
         this.limits = limits;
-        frame.setVisible(false);
+        oldFrame = frame;
+        this.newFrame = newFrame;
+        this.products = products;
+        productImages = new ArrayList<>();
+        productTexts = new ArrayList<>();
+        boxes = new ArrayList<>();
+        productButtons = new ArrayList<>();
+    }
+
+    private void InitialiseSecondPannel() throws IOException {
+        // initialise images
+        productImages.add(ImageIO.read(new File("prime.png")));
+        productImages.add(ImageIO.read(new File("pro.png")));
+        productImages.add(ImageIO.read(new File("vpn.png")));
+        productImages.add(ImageIO.read(new File("pass.png")));
+        productImages.add(ImageIO.read(new File("optim.png")));
+        productImages.add(ImageIO.read(new File("speed.png")));
+
+        // initialise texts
+        for (int i = 0; i < 6; ++i) {
+            JLabel temp = new JLabel("  " + products.get(i).getName() + "\n " + products.get(i).getPrice() + "$");
+            temp.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            temp.setSize(30, 30);
+            temp.setBackground(Color.WHITE);
+            temp.setVerticalTextPosition(SwingConstants.BOTTOM);
+            productTexts.add(temp);
+        }
+
+        // initialise boxes and buttons
+        BufferedImage cart = ImageIO.read(new File("cart.jpg"));
+        for (int i = 0; i < 6; ++i) {
+            boxes.add(Box.createHorizontalBox());
+            productButtons.add(new JButton(new ImageIcon(cart)));
+        }
+    }
+
+    public void driver() throws IOException {
+        InitialiseSecondPannel();
+        oldFrame.setVisible(false);
         newFrame.setVisible(true);
         JPanel productPanel = new JPanel();
         newFrame.setSize(1000, 600);
@@ -39,105 +78,22 @@ public class ProductPanel {
         newFrame.setLocation(x, y);
         newFrame.getContentPane().add(BorderLayout.CENTER, productPanel);
 
-        BufferedImage cart = ImageIO.read(new File("cart.jpg"));
-        BufferedImage prime = ImageIO.read(new File("prime.png"));
-        BufferedImage pro = ImageIO.read(new File("pro.png"));
-        BufferedImage vpn = ImageIO.read(new File("vpn.png"));
-        BufferedImage pass = ImageIO.read(new File("pass.png"));
-        BufferedImage optim = ImageIO.read(new File("optim.png"));
-        BufferedImage speed = ImageIO.read(new File("speed.png"));
+        for (int i = 0; i < 6; ++i) {
+            boxes.get(i).add(new JLabel(new ImageIcon(productImages.get(i))));
+            boxes.get(i).add(productButtons.get(i));
+        }
 
+//        proBox.setLocation(0, 0);
 
-        Box primeBox = Box.createHorizontalBox();
-        Box proBox = Box.createHorizontalBox();
-        Box vpnBox = Box.createHorizontalBox();
-        Box passBox = Box.createHorizontalBox();
-        Box optimBox = Box.createHorizontalBox();
-        Box speedBox = Box.createHorizontalBox();
-
-        JButton buttonPrime = new JButton(new ImageIcon(cart));
-        JButton buttonPro = new JButton(new ImageIcon(cart));
-        JButton buttonVpn = new JButton(new ImageIcon(cart));
-        JButton buttonPass = new JButton(new ImageIcon(cart));
-        JButton buttonOptim = new JButton(new ImageIcon(cart));
-        JButton buttonSpeed = new JButton(new ImageIcon(cart));
-
-        primeBox.add(new JLabel(new ImageIcon(prime)));
-        primeBox.add(buttonPrime);
-
-        proBox.add(new JLabel(new ImageIcon(pro)));
-        proBox.add(buttonPro);
-        proBox.setLocation(0, 0);
-
-        vpnBox.add(new JLabel(new ImageIcon(vpn)));
-        vpnBox.add(buttonVpn);
-
-        passBox.add(new JLabel(new ImageIcon(pass)));
-        passBox.add(buttonPass);
-
-        optimBox.add(new JLabel(new ImageIcon(optim)));
-        optimBox.add(buttonOptim);
-
-        speedBox.add(new JLabel(new ImageIcon(speed)));
-        speedBox.add(buttonSpeed);
-
-        productPanel.add(primeBox);
-        productPanel.add(proBox);
-        productPanel.add(vpnBox);
-        productPanel.add(passBox);
-        productPanel.add(optimBox);
-        productPanel.add(speedBox);
+        for (int i = 0; i < 6; ++i) {
+            productPanel.add(boxes.get(i));
+        }
         productPanel.setVisible(true);
 
+        for (int i = 0; i < 6; ++i) {
+            boxes.get(i).add(productTexts.get(i));
+        }
 
-        JLabel textPrime = new JLabel("  AVIRA PRIME\n 75$");
-        textPrime.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        textPrime.setSize(30, 30);
-        textPrime.setBackground(Color.WHITE);
-        primeBox.add(textPrime);
-        textPrime.setVerticalTextPosition(SwingConstants.BOTTOM);
-//        textPrime.setLocation(500, 100);
-
-
-        JLabel textPro = new JLabel("  AVIRA PRO: 35$");
-        textPro.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        textPro.setSize(30, 30);
-        textPro.setBackground(Color.WHITE);
-        proBox.add(textPro);
-        textPro.setVerticalTextPosition(SwingConstants.BOTTOM);
-//        textPrime.setLocation(500, 100);
-
-        JLabel textVpn = new JLabel("  AVIRA VPN: 50$");
-        textVpn.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        textVpn.setSize(30, 30);
-        textVpn.setBackground(Color.WHITE);
-        vpnBox.add(textVpn);
-        textVpn.setVerticalTextPosition(SwingConstants.BOTTOM);
-//        textPrime.setLocation(  500, 100);
-
-        JLabel textPassword = new JLabel("  AVIRA Passwod Manager: 20$");
-        textPassword.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        textPassword.setSize(30, 30);
-        textPassword.setBackground(Color.WHITE);
-        passBox.add(textPassword);
-        textPassword.setVerticalTextPosition(SwingConstants.BOTTOM);
-//        textPrime.setLocation(  500, 100);
-
-        JLabel textOptim = new JLabel("  AVIRA Optimizer: 10$");
-        textOptim.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        textOptim.setSize(30, 30);
-        textOptim.setBackground(Color.WHITE);
-        optimBox.add(textOptim);
-        textOptim.setVerticalTextPosition(SwingConstants.BOTTOM);
-//        textPrime.setLocation(  500, 100);
-
-        JLabel textSystem = new JLabel("  AVIRA System Speedup: 25$");
-        textSystem.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        textSystem.setSize(30, 30);
-        textSystem.setBackground(Color.WHITE);
-        speedBox.add(textSystem);
-        textSystem.setVerticalTextPosition(SwingConstants.BOTTOM);
-//        textPrime.setLocation(  500, 100);
         productPanel.setBackground(Color.WHITE);
 
         Box cntBox = Box.createVerticalBox();
@@ -155,160 +111,141 @@ public class ProductPanel {
         qStart.setSize(30, 30);
         qStart.setBackground(Color.WHITE);
 
-        JLabel cntPrime = new JLabel("AVIRA Prime: ");
-        cntPrime.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        cntPrime.setSize(30, 30);
-        cntPrime.setBackground(Color.WHITE);
-        JLabel qPrime = new JLabel("   " + nrprime);
-        qPrime.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        qPrime.setSize(30, 30);
-        qPrime.setBackground(Color.WHITE);
-//        qprime.add(cntPrime);
-//        qprime.add(qPrime);
-        cntBox.add(cntPrime);
-//        cntBox.add(q);
-
-//        Box qpro = Box.createHorizontalBox();
-        JLabel cntPro = new JLabel("AVIRA PRO: ");
-        cntPro.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        cntPro.setSize(30, 30);
-        cntPro.setBackground(Color.WHITE);
-        JLabel qPro = new JLabel("   " + nrpro);
-        qPro.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        qPro.setSize(30, 30);
-        qPro.setBackground(Color.WHITE);
-//        qpro.add(cntPro);
-//        qpro.add(qPro);
-        cntBox.add(cntPro);
-
-//        Box qvpn = Box.createHorizontalBox();
-        JLabel cntVpn = new JLabel("AVIRA VPN: ");
-        cntVpn.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        cntVpn.setSize(30, 30);
-        cntVpn.setBackground(Color.WHITE);
-        JLabel qVpn = new JLabel("   " + nrvpn);
-        qVpn.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        qVpn.setSize(30, 30);
-        qVpn.setBackground(Color.WHITE);
-        cntBox.add(cntVpn);
-
-        JLabel cntPass = new JLabel("AVIRA Password Manager: ");
-        cntPass.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        cntPass.setSize(30, 30);
-        cntPass.setBackground(Color.WHITE);
-        JLabel qPass = new JLabel("   " + nrpass);
-        qPass.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        qPass.setSize(30, 30);
-        qPass.setBackground(Color.WHITE);
-        cntBox.add(cntPass);
-
-        JLabel cntOptim = new JLabel("AVIRA Optimizer: ");
-        cntOptim.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        cntOptim.setSize(30, 30);
-        cntOptim.setBackground(Color.WHITE);
-        JLabel qOptim = new JLabel("   " + nroptim);
-        qOptim.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        qOptim.setSize(30, 30);
-        qOptim.setBackground(Color.WHITE);
-        cntBox.add(cntOptim);
-
-        JLabel cntSpeed = new JLabel("AVIRA System Speedup: ");
-        cntSpeed.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        cntSpeed.setSize(30, 30);
-        cntSpeed.setBackground(Color.WHITE);
-        JLabel qSpeed = new JLabel("   " + nrspeed);
-        qSpeed.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        qSpeed.setSize(30, 30);
-        qSpeed.setBackground(Color.WHITE);
-        cntBox.add(cntSpeed);
+        ArrayList<JLabel> cnt = new ArrayList<>();
+        ArrayList<JLabel> q = new ArrayList<>();
+        for (int i = 0; i < 6; ++i) {
+            JLabel cntTemp = new JLabel(products.get(i).getName());
+            cntTemp.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            cntTemp.setSize(30, 30);
+            cntTemp.setBackground(Color.WHITE);
+            cnt.add(cntTemp);
+            JLabel qTemp = new JLabel("   " + nr[i]);
+            qTemp.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            qTemp.setSize(30, 30);
+            qTemp.setBackground(Color.WHITE);
+            q.add(qTemp);
+            cntBox.add(cntTemp);
+        }
 
         quant.add(qStart);
-        quant.add(qPrime);
-        quant.add(qPro);
-        quant.add(qVpn);
-        quant.add(qPass);
-        quant.add(qOptim);
-        quant.add(qSpeed);
+        for (int i = 0; i < 6; ++i) {
+            quant.add(q.get(i));
+        }
         cartBox.add(cntBox);
         cartBox.add(quant);
-        productPanel.add(cntBox);
-        productPanel.add(quant);
+//        productPanel.add(cntBox);
+//        productPanel.add(quant);
 
-        buttonPrime.addActionListener(new ActionListener() {
+//        for (int i = 0; i < 6; ++i) {
+//            int finalI = i;
+//            productButtons.get(i).addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    nr[finalI]++;
+//                    if (nr[finalI] > limits[finalI]) {
+//                        nr[finalI]--;
+//
+//                    }
+//                }
+//            });
+//        }
+
+        productButtons.get(0).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nrprime++;
-                if (nrprime > limits.limitPrime) {
-                    nrprime--;
-                    qPrime.setForeground(Color.RED);
+                nr[0]++;
+                if (nr[0] > limits.limitPrime) {
+                    nr[0]--;
+                    q.get(0).setForeground(Color.RED);
                 }
-                qPrime.setText("   " + nrprime);
+                q.get(0).setText("   " + nr[0]);
             }
         });
-        buttonPro.addActionListener(new ActionListener() {
+        productButtons.get(1).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nrpro++;
-                if (nrpro > limits.limitPro) {
-                    nrpro--;
-                    qPro.setForeground(Color.RED);
+                nr[1]++;
+                if (nr[1] > limits.limitPro) {
+                    nr[1]--;
+                    q.get(1).setForeground(Color.RED);
                 }
-                qPro.setText("   " + nrpro);
+                q.get(1).setText("   " + nr[1]);
             }
         });
-        buttonVpn.addActionListener(new ActionListener() {
+        productButtons.get(2).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nrvpn++;
-                if (nrvpn > limits.limitVpn) {
-                    nrvpn--;
-                    qVpn.setForeground(Color.RED);
+                nr[2]++;
+                if (nr[2] > limits.limitVpn) {
+                    nr[2]--;
+                    q.get(2).setForeground(Color.RED);
                 }
-                qVpn.setText("   " + nrvpn);
+                q.get(2).setText("   " + nr[2]);
             }
         });
-        buttonPass.addActionListener(new ActionListener() {
+        productButtons.get(3).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nrpass++;
-                if (nrpass > limits.limitPass) {
-                    nrpass--;
-                    qPass.setForeground(Color.RED);
+                nr[3]++;
+                if (nr[3] > limits.limitPass) {
+                    nr[3]--;
+                    q.get(3).setForeground(Color.RED);
                 }
-                qPass.setText("   " + nrpass);
+                q.get(3).setText("   " + nr[3]);
             }
         });
-        buttonOptim.addActionListener(new ActionListener() {
+        productButtons.get(4).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nroptim++;
-                if (nroptim > limits.limitOptim) {
-                    nroptim--;
-                    qOptim.setForeground(Color.RED);
+                nr[4]++;
+                if (nr[4] > limits.limitOptim) {
+                    nr[4]--;
+                    q.get(4).setForeground(Color.RED);
                 }
-                qOptim.setText("   " + nroptim);
+                q.get(4).setText("   " + nr[4]);
             }
         });
-        buttonSpeed.addActionListener(new ActionListener() {
+        productButtons.get(5).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nrspeed++;
-                if (nrspeed > limits.limitSpeed) {
-                    nrspeed--;
-                    qSpeed.setForeground(Color.RED);
+                nr[5]++;
+                if (nr[5] > limits.limitSpeed) {
+                    nr[5]--;
+                    q.get(5).setForeground(Color.RED);
                 }
-                qSpeed.setText("   " + nrspeed);
+                q.get(5).setText("   " + nr[5]);
             }
         });
-//        cntBox.setLayout(null);
-//        cntBox.setLocation(100, 300);
+        Box buttonBox = Box.createHorizontalBox();
+        JButton finishButton = new JButton();
+        finishButton.setBounds(150, 600, 400, 170);
+        finishButton.setBackground(Color.RED);
+        finishButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
+        finishButton.setText("Go to payment");
+//        finishButton.addActionListener(new AbstractAction() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                stockFrame.setVisible(false);
+//                limits.setLimits(Integer.parseInt(qPrime.getText().substring(5)), Integer.parseInt(qPro.getText().substring(5)), Integer.parseInt(qVpn.getText().substring(5)),
+//                        Integer.parseInt(qPass.getText().substring(5)), Integer.parseInt(qOptim.getText().substring(5)), Integer.parseInt(qSpeed.getText().substring(5)));
+//                new MainFrame(limits);
+//            }
+//        });
+        finishButton.setForeground(Color.WHITE);
+        finishButton.setFocusable(false);
+        buttonBox.add(finishButton);
+        Box all = Box.createVerticalBox();
+        all.add(cartBox);
+        all.add(Box.createVerticalStrut(30));
+        all.add(buttonBox);
+        productPanel.add(all);
     }
 
-    public static JFrame getInstance(JFrame frame, JFrame newFrame, Limits limits) throws IOException {
+    public static ProductPanel getInstance(JFrame frame, JFrame newFrame, Limits limits, ArrayList<Product> products) throws IOException {
         if (instance == null) {
-            instance = new ProductPanel(frame, newFrame, limits);
+            instance = new ProductPanel(frame, newFrame, limits, products);
         }
-        return instance.productFrame;
+        return instance;
     }
 
 }

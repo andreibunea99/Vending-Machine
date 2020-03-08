@@ -3,15 +3,22 @@ package avira;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 
-import static avira.ProductPanel.getInstance;
+public class MainFrame {
+//    static MainFrame instance = null;
+//    JFrame mainFrame = new JFrame();
+    int nrprime = 10;
+    int nrpro = 10;
+    int nrvpn = 10;
+    int nrpass = 10;
+    int nroptim = 10;
+    int nrspeed = 10;
+    Limits limits = new Limits();
 
-public class Main {
-
-    public static void main(String[] args) {
-        Limits limits = new Limits();
+    public MainFrame(Limits limits) {
+        this.limits = limits;
         JFrame mainFrame = new JFrame("AVIRA");
         JFrame newFrame = new JFrame("Products");
         mainFrame.setSize(1000, 600);
@@ -31,31 +38,60 @@ public class Main {
         JLabel title = new JLabel("AVIRA Vending Machine");
         title.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 38));
         title.setSize(600, 130);
-        title.setLocation(270, 100);
+        title.setLocation(245, 100);
         title.setForeground(Color.RED);
         title.setBackground(Color.WHITE);
         mainFrame.add(title);
         JLabel team = new JLabel("by Brute Force");
         team.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 26));
         team.setSize(600, 130);
-        team.setLocation(525, 200);
+        team.setLocation(600, 200);
         team.setForeground(Color.BLACK);
         team.setBackground(Color.WHITE);
         mainFrame.add(team);
 
         JButton startingButton = new JButton();
-        startingButton.setBounds(350, 400, 300, 70);
+        startingButton.setBounds(150, 400, 300, 70);
         startingButton.setBackground(Color.RED);
         startingButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
         startingButton.setText("Start Shopping");
         startingButton.setForeground(Color.WHITE);
         startingButton.setFocusable(false);
 
+        JButton itemsButton = new JButton();
+        itemsButton.setBounds(530, 400, 300, 70);
+        itemsButton.setBackground(Color.RED);
+        itemsButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
+        itemsButton.setText("Set initial stock");
+        itemsButton.setForeground(Color.WHITE);
+        itemsButton.setFocusable(false);
+
+        ArrayList<Product> products = new ArrayList<>();
+        products.add(new Product("Avira Prime", 75));
+        products.add(new Product("Antivirus Pro", 35));
+        products.add(new Product("Phantom VPN", 50));
+        products.add(new Product("Password Manager", 20));
+        products.add(new Product("Optimizer", 10));
+        products.add(new Product("System Speedup", 25));
+        Setup.initialiseDefaultInventory(products);
+
         startingButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    ProductPanel.getInstance(mainFrame, newFrame, limits);
+                    ProductPanel productPanel = ProductPanel.getInstance(mainFrame, newFrame, limits, products);
+                    productPanel.driver();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        itemsButton.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    StockFrame.getInstance(mainFrame, newFrame, limits);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -63,9 +99,9 @@ public class Main {
         });
 
         mainFrame.add(startingButton);
+        mainFrame.add(itemsButton);
         mainFrame.setLayout(null);
         mainFrame.setVisible(true);
-
-//        main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
     }
+
 }
