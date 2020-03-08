@@ -24,6 +24,9 @@ public class Cart {
         }
         return false;
     }
+    public Product getCartItem(int index) {
+        return products.get(index);
+    }
     public void showCart() {
         int total = 0;
         for (Product p : products) {

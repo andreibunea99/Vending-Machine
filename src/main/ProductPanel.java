@@ -20,6 +20,7 @@ public class ProductPanel {
     ArrayList<JButton> productButtons;
     int[] nr = {0, 0, 0, 0, 0, 0};
     Limits limits = new Limits();
+    Cart cart;
 
     private ProductPanel(JFrame frame, JFrame newFrame, Limits limits, ArrayList<Product> products) throws IOException {
         this.limits = limits;
@@ -30,6 +31,7 @@ public class ProductPanel {
         productTexts = new ArrayList<>();
         boxes = new ArrayList<>();
         productButtons = new ArrayList<>();
+        cart = new Cart(products);
     }
 
     private void InitialiseSecondPannel() throws IOException {
@@ -83,8 +85,6 @@ public class ProductPanel {
             boxes.get(i).add(productButtons.get(i));
         }
 
-//        proBox.setLocation(0, 0);
-
         for (int i = 0; i < 6; ++i) {
             productPanel.add(boxes.get(i));
         }
@@ -133,32 +133,15 @@ public class ProductPanel {
         }
         cartBox.add(cntBox);
         cartBox.add(quant);
-        productPanel.add(cntBox);
-        productPanel.add(quant);
-
-//        for (int i = 0; i < 6; ++i) {
-//            int finalI = i;
-//            productButtons.get(i).addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    nr[finalI]++;
-//                    if (nr[finalI] > limits[finalI]) {
-//                        nr[finalI]--;
-//
-//                    }
-//                }
-//            });
-//        }
 
         productButtons.get(0).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nr[0]++;
-                if (nr[0] > limits.limitPrime) {
-                    nr[0]--;
+                if (cart.buy(0, 1)) {
+                    q.get(0).setText("   " + cart.getCartItem(0).getQuantity());
+                } else {
                     q.get(0).setForeground(Color.RED);
                 }
-                q.get(0).setText("   " + nr[0]);
             }
         });
         productButtons.get(1).addActionListener(new ActionListener() {
@@ -216,6 +199,27 @@ public class ProductPanel {
                 q.get(5).setText("   " + nr[5]);
             }
         });
+        Box buttonBox = Box.createHorizontalBox();
+        JButton finishButton = new JButton();
+        finishButton.setBounds(150, 600, 400, 170);
+        finishButton.setBackground(Color.RED);
+        finishButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
+        finishButton.setText("Go to payment");
+        finishButton.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                productPanel.setVisible(false);
+//                new PaymentFrame(products);
+            }
+        });
+        finishButton.setForeground(Color.WHITE);
+        finishButton.setFocusable(false);
+        buttonBox.add(finishButton);
+        Box all = Box.createVerticalBox();
+        all.add(cartBox);
+        all.add(Box.createVerticalStrut(30));
+        all.add(buttonBox);
+        productPanel.add(all);
     }
 
     public static ProductPanel getInstance(JFrame frame, JFrame newFrame, Limits limits, ArrayList<Product> products) throws IOException {
