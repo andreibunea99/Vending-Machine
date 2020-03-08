@@ -11,7 +11,6 @@ import static avira.ProductPanel.getInstance;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Limits limits = new Limits();
-        new MainFrame(limits);
+        new MainFrame();
     }
 }

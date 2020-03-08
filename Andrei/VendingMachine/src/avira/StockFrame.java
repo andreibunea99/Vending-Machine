@@ -4,20 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class StockFrame {
     static StockFrame instance = null;
     JFrame stockFrame = new JFrame();
-    int nrprime = 10;
-    int nrpro = 10;
-    int nrvpn = 10;
-    int nrpass = 10;
-    int nroptim = 10;
-    int nrspeed = 10;
-    Limits limits = new Limits();
+    ArrayList<Product> products;
 
-    private StockFrame(JFrame frame, JFrame newFrame, Limits limits) throws IOException {
-        this.limits = limits;
+    private StockFrame(JFrame frame, JFrame newFrame, ArrayList<Product> p) throws IOException {
+        products = p;
         frame.setVisible(false);
         newFrame.setVisible(true);
         JPanel stockPanel = new JPanel();
@@ -39,7 +34,6 @@ public class StockFrame {
         Box cntBox = Box.createVerticalBox();
         Box cartBox = Box.createHorizontalBox();
         Box quant = Box.createVerticalBox();
-//        Box qprime = Box.createHorizontalBox();
 
         JLabel blank = new JLabel(" ");
         blank.setFont(new Font(Font.MONOSPACED, Font.BOLD, 72));
@@ -61,84 +55,29 @@ public class StockFrame {
         qStart.setSize(30, 30);
         qStart.setBackground(Color.WHITE);
 
-        JLabel cntPrime = new JLabel("AVIRA Prime: ");
-        cntPrime.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        cntPrime.setSize(30, 30);
-        cntPrime.setBackground(Color.WHITE);
-        JTextField qPrime = new JTextField("     " + nrprime);
-        qPrime.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        qPrime.setSize(30, 30);
-        qPrime.setBackground(Color.WHITE);
-//        qprime.add(cntPrime);
-//        qprime.add(qPrime);
-        cntBox.add(cntPrime);
-//        cntBox.add(q);
-
-//        Box qpro = Box.createHorizontalBox();
-        JLabel cntPro = new JLabel("AVIRA PRO: ");
-        cntPro.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        cntPro.setSize(30, 30);
-        cntPro.setBackground(Color.WHITE);
-        JTextField qPro = new JTextField("     " + nrpro);
-        qPro.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        qPro.setSize(30, 30);
-        qPro.setBackground(Color.WHITE);
-//        qpro.add(cntPro);
-//        qpro.add(qPro);
-        cntBox.add(cntPro);
-
-//        Box qvpn = Box.createHorizontalBox();
-        JLabel cntVpn = new JLabel("AVIRA VPN: ");
-        cntVpn.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        cntVpn.setSize(30, 30);
-        cntVpn.setBackground(Color.WHITE);
-        JTextField qVpn = new JTextField("     " + nrvpn);
-        qVpn.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        qVpn.setSize(30, 30);
-        qVpn.setBackground(Color.WHITE);
-        cntBox.add(cntVpn);
-
-        JLabel cntPass = new JLabel("AVIRA Password Manager: ");
-        cntPass.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        cntPass.setSize(30, 30);
-        cntPass.setBackground(Color.WHITE);
-        JTextField qPass = new JTextField("     " + nrpass);
-        qPass.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        qPass.setSize(30, 30);
-        qPass.setBackground(Color.WHITE);
-        cntBox.add(cntPass);
-
-        JLabel cntOptim = new JLabel("AVIRA Optimizer: ");
-        cntOptim.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        cntOptim.setSize(30, 30);
-        cntOptim.setBackground(Color.WHITE);
-        JTextField qOptim = new JTextField("     " + nroptim);
-        qOptim.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        qOptim.setSize(30, 30);
-        qOptim.setBackground(Color.WHITE);
-        cntBox.add(cntOptim);
-
-        JLabel cntSpeed = new JLabel("AVIRA System Speedup: ");
-        cntSpeed.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        cntSpeed.setSize(30, 30);
-        cntSpeed.setBackground(Color.WHITE);
-        JTextField qSpeed = new JTextField("     " + nrspeed);
-        qSpeed.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
-        qSpeed.setBackground(Color.WHITE);
-        cntBox.add(cntSpeed);
+        ArrayList<JLabel> cnt = new ArrayList<>();
+        ArrayList<JTextField> q = new ArrayList<>();
+        for (int i = 0; i < 6; ++i) {
+            JLabel cntTemp = new JLabel(products.get(i).getName() + ": ");
+            cntTemp.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
+            cntTemp.setSize(30, 30);
+            cntTemp.setBackground(Color.WHITE);
+            cnt.add(cntTemp);
+            JTextField qTemp = new JTextField("     " + products.get(i).getQuantity());
+            qTemp.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
+            qTemp.setSize(30, 30);
+            qTemp.setBackground(Color.WHITE);
+            q.add(qTemp);
+            cntBox.add(cntTemp);
+        }
 
         quant.add(qBlank);
         quant.add(qStart);
-        quant.add(qPrime);
-        quant.add(qPro);
-        quant.add(qVpn);
-        quant.add(qPass);
-        quant.add(qOptim);
-        quant.add(qSpeed);
+        for (int i = 0; i < 6; ++i) {
+            quant.add(q.get(i));
+        }
         cartBox.add(cntBox);
         cartBox.add(quant);
-//        stockPanel.add(cntBox);
-//        stockPanel.add(quant);
 
         Box buttonBox = Box.createHorizontalBox();
         JButton startingButton = new JButton();
@@ -150,9 +89,12 @@ public class StockFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 stockFrame.setVisible(false);
-                limits.setLimits(Integer.parseInt(qPrime.getText().substring(5)), Integer.parseInt(qPro.getText().substring(5)), Integer.parseInt(qVpn.getText().substring(5)),
-                        Integer.parseInt(qPass.getText().substring(5)), Integer.parseInt(qOptim.getText().substring(5)), Integer.parseInt(qSpeed.getText().substring(5)));
-                new MainFrame(limits);
+                int[] n = new int[6];
+                for (int i = 0; i < 6; ++i) {
+                    n[i] = Integer.parseInt(q.get(i).getText().substring(5));
+                }
+                Setup.initialiseCustomInventory(products, n);
+                new MainFrame();
             }
         });
         startingButton.setForeground(Color.WHITE);
@@ -163,14 +105,13 @@ public class StockFrame {
         all.add(Box.createVerticalStrut(30));
         all.add(buttonBox);
         stockPanel.add(all);
-//        cntBox.add(startingButton);
     }
 
-    public static JFrame getInstance(JFrame frame, JFrame newFrame, Limits limits) throws IOException {
+    public static StockFrame getInstance(JFrame frame, JFrame newFrame, ArrayList<Product> products) throws IOException {
         if (instance == null) {
-            instance = new StockFrame(frame, newFrame, limits);
+            instance = new StockFrame(frame, newFrame, products);
         }
-        return instance.stockFrame;
+        return instance;
     }
 
 }

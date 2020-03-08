@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainFrame {
-//    static MainFrame instance = null;
+    //    static MainFrame instance = null;
 //    JFrame mainFrame = new JFrame();
     int nrprime = 10;
     int nrpro = 10;
@@ -15,10 +15,8 @@ public class MainFrame {
     int nrpass = 10;
     int nroptim = 10;
     int nrspeed = 10;
-    Limits limits = new Limits();
 
-    public MainFrame(Limits limits) {
-        this.limits = limits;
+    public MainFrame() {
         JFrame mainFrame = new JFrame("AVIRA");
         JFrame newFrame = new JFrame("Products");
         mainFrame.setSize(1000, 600);
@@ -66,20 +64,25 @@ public class MainFrame {
         itemsButton.setForeground(Color.WHITE);
         itemsButton.setFocusable(false);
 
-        ArrayList<Product> products = new ArrayList<>();
-        products.add(new Product("Avira Prime", 75));
-        products.add(new Product("Antivirus Pro", 35));
-        products.add(new Product("Phantom VPN", 50));
-        products.add(new Product("Password Manager", 20));
-        products.add(new Product("Optimizer", 10));
-        products.add(new Product("System Speedup", 25));
-        Setup.initialiseDefaultInventory(products);
+        final ArrayList<Product>[] products = new ArrayList[]{new ArrayList<>()};
+        products[0].add(new Product("Avira Prime", 75));
+        products[0].add(new Product("Antivirus Pro", 35));
+        products[0].add(new Product("Phantom VPN", 50));
+        products[0].add(new Product("Password Manager", 20));
+        products[0].add(new Product("Optimizer", 10));
+        products[0].add(new Product("System Speedup", 25));
+//        Setup.initialiseDefaultInventory(products);
 
         startingButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    ProductPanel productPanel = ProductPanel.getInstance(mainFrame, newFrame, limits, products);
+                    if (!Setup.initialised) {
+                        Setup.initialiseDefaultInventory(products[0]);
+                    } else {
+                        products[0] = Setup.productsCopy;
+                    }
+                    ProductPanel productPanel = ProductPanel.getInstance(mainFrame, newFrame, products[0]);
                     productPanel.driver();
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -91,7 +94,7 @@ public class MainFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    StockFrame.getInstance(mainFrame, newFrame, limits);
+                    StockFrame.getInstance(mainFrame, newFrame, products[0]);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

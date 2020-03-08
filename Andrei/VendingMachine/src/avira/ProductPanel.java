@@ -19,10 +19,9 @@ public class ProductPanel {
     ArrayList<Box> boxes;
     ArrayList<JButton> productButtons;
     int[] nr = {0, 0, 0, 0, 0, 0};
-    Limits limits = new Limits();
+    Cart cart;
 
-    private ProductPanel(JFrame frame, JFrame newFrame, Limits limits, ArrayList<Product> products) throws IOException {
-        this.limits = limits;
+    private ProductPanel(JFrame frame, JFrame newFrame, ArrayList<Product> products) throws IOException {
         oldFrame = frame;
         this.newFrame = newFrame;
         this.products = products;
@@ -30,6 +29,7 @@ public class ProductPanel {
         productTexts = new ArrayList<>();
         boxes = new ArrayList<>();
         productButtons = new ArrayList<>();
+        cart = new Cart(products);
     }
 
     private void InitialiseSecondPannel() throws IOException {
@@ -83,8 +83,6 @@ public class ProductPanel {
             boxes.get(i).add(productButtons.get(i));
         }
 
-//        proBox.setLocation(0, 0);
-
         for (int i = 0; i < 6; ++i) {
             productPanel.add(boxes.get(i));
         }
@@ -111,14 +109,12 @@ public class ProductPanel {
         qStart.setSize(30, 30);
         qStart.setBackground(Color.WHITE);
 
-        ArrayList<JLabel> cnt = new ArrayList<>();
         ArrayList<JLabel> q = new ArrayList<>();
         for (int i = 0; i < 6; ++i) {
             JLabel cntTemp = new JLabel(products.get(i).getName());
             cntTemp.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
             cntTemp.setSize(30, 30);
             cntTemp.setBackground(Color.WHITE);
-            cnt.add(cntTemp);
             JLabel qTemp = new JLabel("   " + nr[i]);
             qTemp.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
             qTemp.setSize(30, 30);
@@ -133,104 +129,30 @@ public class ProductPanel {
         }
         cartBox.add(cntBox);
         cartBox.add(quant);
-//        productPanel.add(cntBox);
-//        productPanel.add(quant);
 
-//        for (int i = 0; i < 6; ++i) {
-//            int finalI = i;
-//            productButtons.get(i).addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    nr[finalI]++;
-//                    if (nr[finalI] > limits[finalI]) {
-//                        nr[finalI]--;
-//
-//                    }
-//                }
-//            });
-//        }
-
-        productButtons.get(0).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nr[0]++;
-                if (nr[0] > limits.limitPrime) {
-                    nr[0]--;
-                    q.get(0).setForeground(Color.RED);
+        for (int i = 0; i < 6; ++i) {
+            int finalI = i;
+            productButtons.get(i).addActionListener(e -> {
+                if (cart.buy(finalI + 1, 1)) {
+                    q.get(finalI).setText("   " + cart.getCartItem(finalI).getQuantity());
+                } else {
+                    q.get(finalI).setForeground(Color.RED);
                 }
-                q.get(0).setText("   " + nr[0]);
-            }
-        });
-        productButtons.get(1).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nr[1]++;
-                if (nr[1] > limits.limitPro) {
-                    nr[1]--;
-                    q.get(1).setForeground(Color.RED);
-                }
-                q.get(1).setText("   " + nr[1]);
-            }
-        });
-        productButtons.get(2).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nr[2]++;
-                if (nr[2] > limits.limitVpn) {
-                    nr[2]--;
-                    q.get(2).setForeground(Color.RED);
-                }
-                q.get(2).setText("   " + nr[2]);
-            }
-        });
-        productButtons.get(3).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nr[3]++;
-                if (nr[3] > limits.limitPass) {
-                    nr[3]--;
-                    q.get(3).setForeground(Color.RED);
-                }
-                q.get(3).setText("   " + nr[3]);
-            }
-        });
-        productButtons.get(4).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nr[4]++;
-                if (nr[4] > limits.limitOptim) {
-                    nr[4]--;
-                    q.get(4).setForeground(Color.RED);
-                }
-                q.get(4).setText("   " + nr[4]);
-            }
-        });
-        productButtons.get(5).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nr[5]++;
-                if (nr[5] > limits.limitSpeed) {
-                    nr[5]--;
-                    q.get(5).setForeground(Color.RED);
-                }
-                q.get(5).setText("   " + nr[5]);
-            }
-        });
+            });
+        }
         Box buttonBox = Box.createHorizontalBox();
         JButton finishButton = new JButton();
         finishButton.setBounds(150, 600, 400, 170);
         finishButton.setBackground(Color.RED);
         finishButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
         finishButton.setText("Go to payment");
-//        finishButton.addActionListener(new AbstractAction() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                stockFrame.setVisible(false);
-//                limits.setLimits(Integer.parseInt(qPrime.getText().substring(5)), Integer.parseInt(qPro.getText().substring(5)), Integer.parseInt(qVpn.getText().substring(5)),
-//                        Integer.parseInt(qPass.getText().substring(5)), Integer.parseInt(qOptim.getText().substring(5)), Integer.parseInt(qSpeed.getText().substring(5)));
-//                new MainFrame(limits);
-//            }
-//        });
+        finishButton.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                productPanel.setVisible(false);
+                new PaymentFrame(newFrame, cart.getProducts());
+            }
+        });
         finishButton.setForeground(Color.WHITE);
         finishButton.setFocusable(false);
         buttonBox.add(finishButton);
@@ -241,9 +163,9 @@ public class ProductPanel {
         productPanel.add(all);
     }
 
-    public static ProductPanel getInstance(JFrame frame, JFrame newFrame, Limits limits, ArrayList<Product> products) throws IOException {
+    public static ProductPanel getInstance(JFrame frame, JFrame newFrame, ArrayList<Product> products) throws IOException {
         if (instance == null) {
-            instance = new ProductPanel(frame, newFrame, limits, products);
+            instance = new ProductPanel(frame, newFrame, products);
         }
         return instance;
     }
