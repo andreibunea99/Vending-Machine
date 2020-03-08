@@ -11,8 +11,11 @@ import static avira.ProductPanel.getInstance;
 public class Main {
 
     public static void main(String[] args) {
+        Limits limits = new Limits();
         JFrame mainFrame = new JFrame("AVIRA");
+        JFrame newFrame = new JFrame("Products");
         mainFrame.setSize(1000, 600);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.getContentPane().setBackground(Color.WHITE);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         int w = mainFrame.getSize().width;
@@ -48,11 +51,11 @@ public class Main {
         startingButton.setForeground(Color.WHITE);
         startingButton.setFocusable(false);
 
-        startingButton.addActionListener(new ActionListener() {
+        startingButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    ProductPanel pp = getInstance(mainFrame);
+                    ProductPanel.getInstance(mainFrame, newFrame, limits);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
